@@ -1,0 +1,87 @@
+version: "2.2"
+
+services:
+  es04:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.0
+    volumes:
+      - cluster01_certs:/usr/share/elasticsearch/config/certs
+      - esdata01:/usr/share/elasticsearch/data
+      - /mnt/backup:/usr/share/elasticsearch/backup
+    ports:
+      - ${ES_PORT2}:9200
+      - ${EST_PORT2}:9300
+    environment:
+      - node.name=es04
+      - cluster.name=${CLUSTER_NAME2}
+      - cluster.initial_master_nodes=es04
+      - discovery.seed_hosts=es01
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD2}
+      - path.repo=/usr/share/elasticsearch/backup
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/es04/es04.key
+      - xpack.security.http.ssl.certificate=certs/es04/es04.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.http.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es04/es04.key
+      - xpack.security.transport.ssl.certificate=certs/es04/es04.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.license.self_generated.type=${LICENSE}
+    mem_limit: ${MEM_LIMIT}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+
+  kibana:
+    depends_on:
+      es04:
+        condition: service_healthy
+    image: docker.elastic.co/kibana/kibana:7.13.0
+    volumes:
+      - cluster01_certs:/usr/share/kibana/config/certs
+      - kibanadata:/usr/share/kibana/data
+    ports:
+      - ${KIBANA_PORT2}:5601
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=https://es04:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD2}
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+volumes:
+  cluster01_certs:
+    external: true
+  esdata01:
+    driver: local
+  kibanadata:
+    driver: local
+
+networks: 
+  default: 
+    external: 
+      name: cluster01_default 
