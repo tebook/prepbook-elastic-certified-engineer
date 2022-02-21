@@ -25,3 +25,7 @@ sudo chmod 777 /mnt/backup
 sudo /usr/local/bin/docker-compose -f cluster01.yml -p cluster01 up -d
 sudo /usr/local/bin/docker-compose -f cluster02.yml -p cluster02 up -d
 
+node_ip=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
+
+echo "ekcluster01 Kibana GUI is accessible at $node_ip:5601"
+echo "ekcluster02 Kibana GUI is accessible at $node_ip:5602"
