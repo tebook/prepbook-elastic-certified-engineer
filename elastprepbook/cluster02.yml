@@ -30,6 +30,8 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
+      - reindex.remote.whitelist=${NODE_IP}:9200
+      - reindex.ssl.verification_mode=none
     mem_limit: ${MEM_LIMIT}
     ulimits:
       memlock:
