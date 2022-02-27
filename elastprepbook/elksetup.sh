@@ -1,38 +1,64 @@
 #!/bin/bash
 
+# Install Docker
+
 sudo curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
+
+# Enable Docker Service
 
 sudo systemctl start docker
 sudo systemctl enable docker
 
-echo "Installing Docker Compose"
-sudo yum install -y python3-pip
+if [ -f /etc/redhat-release ]; then
+  sudo yum install -y python3-pip
 
+fi
+
+if [ -f /etc/lsb-release ]; then
+  sudo apt-get update
+  sudo apt install -y python3-pip
+fi
+
+# Update pip and install docker-compose
 
 pip3 install -U pip
 pip3 install docker-compose
 
 # Updating sysctl
 
-sudo echo "vm.max_map_count=262144" >> /etc/sysctl.conf
+grep -q '^vm.max_map_count=' /etc/sysctl.conf || echo 'vm.max_map_count=262144' >> /etc/sysctl.conf
+sed -i 's/vm.max_map_count=.*$/'vm.max_map_count=262144'/' /etc/sysctl.conf
+
 sudo sysctl -p
 
-# Directory for snapshot backup and restore
-sudo mkdir /mnt/backup
+# filesystem for snapshot and restore
+
+sudo mkdir -p /mnt/backup
 sudo chmod 777 /mnt/backup
 
-sudo /usr/local/bin/docker-compose -f cluster01.yml -p cluster01 up -d
-sudo /usr/local/bin/docker-compose -f cluster02.yml -p cluster02 up -d
+# Set NODE_IP and SCRIPT_DIR variables
 
 NODE_IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-NODE_IP=192.168.193.177
+if [ -z "$NODE_IP" ]
+then
+echo "Couldn't figure out IP address of the VM, make sure you have an IP assigned and connected to internet. Once done try running this script again"
+else
 
-grep -q '^NODE_IP=' .env || echo 'NODE_IP=VALUE' >> .env
-sed -i 's/NODE_IP=.*$/'NODE_IP="$NODE_IP"'/' .env
+grep -q '^NODE_IP=' $SCRIPT_DIR/.env || echo 'NODE_IP=VALUE' >> $SCRIPT_DIR/.env
+sed -i 's/NODE_IP=.*$/'NODE_IP="$NODE_IP"'/' $SCRIPT_DIR/.env
 
-#grep -qxF 'NODE_IP=$NODE_IP' .env || echo 'NODE_IP='$NODE_IP >> .env
+sudo /usr/local/bin/docker-compose -f $SCRIPT_DIR/cluster01.yml -p cluster01 up -d
+sudo /usr/local/bin/docker-compose -f $SCRIPT_DIR/cluster02.yml -p cluster02 up -d
 
+
+echo ""
+echo "Installation Complete"
+
+echo ""
 echo "ekcluster01 Kibana GUI is accessible at $NODE_IP:5601"
 echo "ekcluster02 Kibana GUI is accessible at $NODE_IP:5602"
+
+fi
