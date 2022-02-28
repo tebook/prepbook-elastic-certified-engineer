@@ -53,12 +53,16 @@ sed -i 's/NODE_IP=.*$/'NODE_IP="$NODE_IP"'/' $SCRIPT_DIR/.env
 sudo /usr/local/bin/docker-compose -f $SCRIPT_DIR/cluster01.yml -p cluster01 up -d
 sudo /usr/local/bin/docker-compose -f $SCRIPT_DIR/cluster02.yml -p cluster02 up -d
 
-
+sleep 10
+if [ $( sudo docker ps | grep -v CONTAINER | wc -l ) -gt 5  ]; then
 echo ""
 echo "Installation Complete"
 
 echo ""
 echo "ekcluster01 Kibana GUI is accessible at $NODE_IP:5601"
 echo "ekcluster02 Kibana GUI is accessible at $NODE_IP:5602"
-
+else
+echo "Installation Failed, correct any possible errors you see and try again"
+exit 2
+fi
 fi
