@@ -8,12 +8,12 @@ Page 31
 
 ![image](https://user-images.githubusercontent.com/99671188/164774029-4eb45b78-5105-4fb4-bbd5-d82b930444d9.png)
 
-We cannot add new documents to a data stream using the _doc API’s PUT format /<target>/_doc/<_id> rather an op_type of create is required.
+We cannot add new documents to a data stream using the _doc API’s PUT method in /target/_doc/<_id> format, rather an op_type of create is required as shown below.
   
 ```
 PUT apachelogs/_create/1
 ```
-Also a simple POST operation on _doc API will also work
+Also a simple POST operation on _doc API will work
  
 ```
 POST apachelogs/_doc
