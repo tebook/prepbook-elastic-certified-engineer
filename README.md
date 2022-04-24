@@ -32,6 +32,27 @@ GET shakespeare_romeo/_search
 DELETE shakespeare_romeo
 ```
 
+Page 44
+
+![image](https://user-images.githubusercontent.com/99671188/164980205-2795e70c-9625-40c8-8d9c-9160d61967dc.png)
+
+
+```
+POST accounts/_update_by_query
+{  
+  "script": {
+    "source": """
+    if (ctx._source.age >= 40){
+    ctx._source.balance+=ctx._source.balance*0.006
+    }else{
+      ctx._source.balance+=ctx._source.balance*0.005
+    }
+    """,
+    "lang": "painless"
+  }
+}
+```
+
 Page 45
 
 <img width="593" alt="errata 3" src="https://user-images.githubusercontent.com/99671188/164978786-0accd359-8f8f-45d9-8f2a-ffce845c0e8f.PNG">
