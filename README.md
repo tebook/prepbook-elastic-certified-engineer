@@ -32,6 +32,12 @@ GET shakespeare_romeo/_search
 DELETE shakespeare_romeo
 ```
 
+Page 45
+
+<img width="593" alt="errata 3" src="https://user-images.githubusercontent.com/99671188/164978786-0accd359-8f8f-45d9-8f2a-ffce845c0e8f.PNG">
+
+
+We can use the _ingest/pipeline API to create a pipeline; let's name the pipeline updateaccounts(pipeline name can be anything of your choice)
 
 
 
@@ -42,7 +48,7 @@ DELETE shakespeare_romeo
 
 
 
-Feel free to join the discussion group for any queries
+# Feel free to join the discussion group for any queries
 
 https://www.facebook.com/groups/259633293011438/
 
