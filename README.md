@@ -19,6 +19,18 @@ Also a simple POST operation on _doc API will work
 POST apachelogs/_doc
 ```
 
+Page 43
+
+<img width="593" alt="errata 2" src="https://user-images.githubusercontent.com/99671188/164977812-4b5849d9-3a25-4681-9089-319d1807e82e.PNG">
+
+
+
+Let's verify and then delete the index
+  
+```
+GET shakespeare_romeo/_search
+DELETE shakespeare_romeo
+```
 
 
 
