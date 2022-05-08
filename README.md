@@ -61,7 +61,12 @@ Page 45
 We can use the _ingest/pipeline API to create a pipeline; let's name the pipeline updateaccounts(pipeline name can be anything of your choice)
 
 
+Page 66
 
+![image](https://user-images.githubusercontent.com/99671188/167283482-14370d90-39f5-451e-9cd6-0dac65d93f3c.png)
+
+
+In the example above, a PUT operation is performed on _security/role API as we are creating a role, followed by the role name, which we conveniently used as demorole.
 
 
 
