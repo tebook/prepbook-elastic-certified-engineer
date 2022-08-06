@@ -1,7 +1,27 @@
 version: "2.2"
 
 services:
+  setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.0
+    volumes:
+      - cluster01_certs:/usr/share/elasticsearch/config/certs
+    user: "0"
+    command: >
+      bash -c '
+      echo "Setting kibana_system password";
+        until curl -s -X POST --cacert config/certs/ca/ca.crt -u elastic:${ELASTIC_PASSWORD2} -H "Content-Type: application/json" https://es04:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD2}\"}" | grep -q "^{}"; do sleep 10; done;
+      echo "All done!";
+      '
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
+      interval: 1s
+      timeout: 5s
+      retries: 120
+
   es04:
+    depends_on:
+      setup:
+        condition: service_healthy
     image: docker.elastic.co/elasticsearch/elasticsearch:8.1.0
     volumes:
       - cluster01_certs:/usr/share/elasticsearch/config/certs
@@ -62,7 +82,7 @@ services:
       - SERVERNAME=kibana
       - ELASTICSEARCH_HOSTS=https://es04:9200
       - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD2}
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD1}
       - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
     mem_limit: ${MEM_LIMIT}
     healthcheck:
@@ -83,7 +103,7 @@ volumes:
   kibanadata:
     driver: local
 
-networks: 
-  default: 
-    external: 
-      name: cluster01_default 
+networks:
+  default:
+    external:
+      name: cluster01_default
