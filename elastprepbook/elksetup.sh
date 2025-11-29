@@ -20,18 +20,6 @@ if [ -f /etc/lsb-release ]; then
   sudo apt install -y python3-pip
 fi
 
-# Update pip and install docker-compose
-
-pip3 install -U pip
-pip3 install docker-compose
-
-# Updating sysctl
-
-grep -q '^vm.max_map_count=' /etc/sysctl.conf || echo 'vm.max_map_count=262144' >> /etc/sysctl.conf
-sed -i 's/vm.max_map_count=.*$/'vm.max_map_count=262144'/' /etc/sysctl.conf
-
-sudo sysctl -p
-
 # filesystem for snapshot and restore
 
 sudo mkdir -p /mnt/backup
@@ -50,8 +38,8 @@ else
 grep -q '^NODE_IP=' $SCRIPT_DIR/.env || echo 'NODE_IP=VALUE' >> $SCRIPT_DIR/.env
 sed -i 's/NODE_IP=.*$/'NODE_IP="$NODE_IP"'/' $SCRIPT_DIR/.env
 
-sudo /usr/local/bin/docker-compose -f $SCRIPT_DIR/cluster01.yml -p cluster01 up -d
-sudo /usr/local/bin/docker-compose -f $SCRIPT_DIR/cluster02.yml -p cluster02 up -d
+sudo /usr/bin/docker compose -f $SCRIPT_DIR/cluster01.yml -p cluster01 up -d
+sudo /usr/bin/docker compose -f $SCRIPT_DIR/cluster02.yml -p cluster02 up -d
 
 sleep 10
 if [ $( sudo docker ps | grep -v CONTAINER | wc -l ) -gt 5  ]; then
