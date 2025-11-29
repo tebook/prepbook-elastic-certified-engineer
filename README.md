@@ -1,6 +1,6 @@
 
-# The Exam Prep Guide to Elastic Certified Engineer Volume 2
-Updated for Latest Exam Version 8.1
+# The Exam Prep Guide to Elastic Certified Engineer Revised Edition
+Updated for Latest Exam Version 8.15
 
 
 
